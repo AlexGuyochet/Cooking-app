@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Mon Cookbook</title>
+  <meta name="description" content="Garde les recettes vues sur Instagram et TikTok dans ton cookbook.">
+  <meta name="theme-color" content="#2f6b3a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Cookbook">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <span class="brand">Cookbook</span>
+    <button class="ghost small" id="logout" hidden>Se déconnecter</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- CONNEXION -->
+  <section id="v-login" class="view" hidden>
+    <div class="panel">
+      <h1>Bienvenue</h1>
+      <p class="muted">Garde les recettes vues sur Insta et TikTok au même endroit. On t'envoie un code par courriel, sans mot de passe.</p>
+      <form id="f-email" class="view" style="gap:12px">
+        <label for="l-email">Courriel
+          <input id="l-email" type="email" autocomplete="email" required placeholder="toi@exemple.com">
+        </label>
+        <button class="primary wide" id="l-send" type="submit">Recevoir mon code</button>
+      </form>
+      <form id="f-code" class="view" style="gap:12px" hidden>
+        <p class="small">Code envoyé à <strong id="l-sent-to"></strong>.</p>
+        <label for="l-code">Code à 6 chiffres
+          <input id="l-code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required>
+        </label>
+        <button class="primary wide" id="l-verify" type="submit">Me connecter</button>
+        <button class="ghost" id="l-back" type="button">Changer de courriel</button>
+      </form>
+      <p id="l-msg" class="note err" hidden></p>
+    </div>
+  </section>
+
+  <!-- COOKBOOK -->
+  <section id="v-list" class="view" hidden>
+    <div class="row spread">
+      <div>
+        <h1>Mon cookbook</h1>
+        <p class="muted" id="count">Chargement…</p>
+      </div>
+      <button class="primary" id="go-import">+ Importer</button>
+    </div>
+    <input id="q" type="search" placeholder="Chercher une recette ou un ingrédient" aria-label="Chercher">
+    <div id="list" class="list"></div>
+    <div id="empty" class="panel empty" hidden>
+      <h2>Ton cookbook t'attend</h2>
+      <p class="muted">Tu as vu une recette sur Insta ou TikTok ? Partage-la vers Cookbook, ou colle le lien et la légende ici.</p>
+      <button class="primary" id="go-import2">Importer ma première recette</button>
+    </div>
+    <p id="offline" class="note" hidden>Hors ligne : tu vois la dernière version enregistrée de ton cookbook.</p>
+  </section>
+
+  <!-- IMPORT -->
+  <section id="v-import" class="view" hidden>
+    <div class="row spread">
+      <button class="ghost" data-back>← Cookbook</button>
+      <div class="steps"><span id="st1" class="on">1. Source</span><span id="st2">2. Vérifier</span></div>
+    </div>
+
+    <div id="imp-1" class="panel">
+      <h2>Importer une recette</h2>
+      <label for="i-url">Lien de la publication <span class="hint">optionnel</span>
+        <input id="i-url" type="url" inputmode="url" placeholder="https://www.instagram.com/p/…">
+      </label>
+
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-text" aria-selected="true">Légende</button>
+        <button class="tab" role="tab" id="tab-image" aria-selected="false">Capture d'écran</button>
+      </div>
+
+      <div id="p-text">
+        <label for="i-caption">Légende de la publication
+          <textarea id="i-caption" rows="9" placeholder="Copie la légende de la publication et colle-la ici. Pour TikTok, le lien suffit souvent."></textarea>
+        </label>
+      </div>
+
+      <div id="p-image" hidden>
+        <div class="drop">
+          <img id="i-preview" alt="Capture importée" hidden>
+          <p class="muted small" id="i-drop-hint">Fais une capture de la légende ou de la recette, puis ajoute-la ici.</p>
+          <label class="primary" for="i-file" style="display:inline-flex;align-items:center;border-radius:999px;padding:11px 18px;cursor:pointer;background:var(--accent);color:var(--accent-ink)">Choisir une image</label>
+          <input id="i-file" type="file" accept="image/*" hidden>
+          <button class="ghost small" id="i-clear" hidden>Retirer l'image</button>
+        </div>
+      </div>
+
+      <div class="row spread">
+        <button class="ghost" id="try-example">Essayer avec un exemple</button>
+        <button class="primary" id="extract">Extraire la recette</button>
+      </div>
+      <p id="imp-msg" class="note err" hidden></p>
+    </div>
+
+    <form id="imp-2" class="panel" hidden>
+      <div class="row spread"><h2 id="r-heading">Vérifie la recette</h2><span class="chip" id="r-platform">Web</span></div>
+      <p id="r-how" class="muted small"></p>
+      <label for="r-title">Titre <input id="r-title" required maxlength="200"></label>
+      <div class="grid3">
+        <label for="r-servings">Portions <input id="r-servings" type="number" min="0" inputmode="numeric"></label>
+        <label for="r-prep">Prépa (min) <input id="r-prep" type="number" min="0" inputmode="numeric"></label>
+        <label for="r-cook">Cuisson (min) <input id="r-cook" type="number" min="0" inputmode="numeric"></label>
+      </div>
+      <label for="r-ing">Ingrédients <span class="hint">un par ligne</span>
+        <textarea id="r-ing" rows="7"></textarea></label>
+      <label for="r-steps">Étapes <span class="hint">une par ligne</span>
+        <textarea id="r-steps" rows="7"></textarea></label>
+      <label for="r-tags">Tags <span class="hint">séparés par des virgules</span>
+        <input id="r-tags" placeholder="dessert, rapide"></label>
+      <div class="row spread">
+        <button type="button" class="ghost" id="back-1">← Retour</button>
+        <button type="submit" class="primary" id="save">Ajouter au cookbook</button>
+      </div>
+      <p id="save-msg" class="note err" hidden></p>
+    </form>
+  </section>
+
+  <!-- FICHE -->
+  <section id="v-detail" class="view" hidden>
+    <button class="ghost" data-back style="justify-self:start">← Cookbook</button>
+    <div class="panel" id="detail"></div>
+    <div class="row spread" id="act-row">
+      <button id="edit">Modifier</button>
+      <button class="danger" id="del">Supprimer</button>
+    </div>
+    <div class="row end" id="del-confirm" hidden>
+      <span class="muted">Supprimer cette recette ?</span>
+      <button id="del-no">Annuler</button>
+      <button class="danger" id="del-yes">Oui, supprimer</button>
+    </div>
+  </section>
+
+  <p id="setup" class="note err" hidden>Configure <code>config.js</code> avec l'URL et la clé anon de ton projet Supabase.</p>
+</main>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
